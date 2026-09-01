@@ -2,14 +2,10 @@
   "use strict";
 
   const EXPLORER_URL = "https://www.judeblock.org/";
-  const DEFAULT = {
-    activeServiceNodes: 364,
-    stakingRequirement: 23600,
-    totalJudeStaked: 364 * 23600,
-    latestBlockHeight: null,
-    latestBlockAge: null,
-    source: "fallback"
-  };
+  const STAKING_REQUIREMENT = 23600;
+  const CACHE_KEY = "judecoin-live-stats-v2";
+  const CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+  let liveRevision = 0;
 
   function ready(fn) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn, { once: true });
@@ -17,7 +13,7 @@
   }
 
   function toNumber(value) {
-    if (value === undefined || value === null) return null;
+    if (value === undefined || value === null || value === "") return null;
     const n = Number(String(value).replace(/,/g, ""));
     return Number.isFinite(n) ? n : null;
   }
@@ -41,7 +37,7 @@
     const latestBlockMatch = text.match(/Height Age \[h:m:s\] Size Type Transaction Hash Fee Rewards In\/Out TX Size\s+([0-9][\d,]*)\s+([0-9]{1,3}:[0-9]{2}:[0-9]{2})/i);
 
     const activeServiceNodes = activeSentence ? toNumber(activeSentence[3]) : activeHeading ? toNumber(activeHeading[1]) : null;
-    const stakingRequirement = stakingMatch ? toNumber(stakingMatch[1]) : DEFAULT.stakingRequirement;
+    const stakingRequirement = stakingMatch ? toNumber(stakingMatch[1]) : STAKING_REQUIREMENT;
     const latestBlockHeight = latestBlockMatch ? toNumber(latestBlockMatch[1]) : null;
     const latestBlockAge = latestBlockMatch ? latestBlockMatch[2] : null;
 
@@ -49,8 +45,8 @@
 
     return {
       activeServiceNodes: activeServiceNodes,
-      stakingRequirement: stakingRequirement || DEFAULT.stakingRequirement,
-      totalJudeStaked: activeServiceNodes * (stakingRequirement || DEFAULT.stakingRequirement),
+      stakingRequirement: stakingRequirement || STAKING_REQUIREMENT,
+      totalJudeStaked: activeServiceNodes * (stakingRequirement || STAKING_REQUIREMENT),
       chainHeight: heightMatch ? toNumber(heightMatch[1]) : null,
       latestBlockHeight: latestBlockHeight,
       latestBlockAge: latestBlockAge,
@@ -66,7 +62,7 @@
   function parseJson(data) {
     if (!data || typeof data !== "object") return null;
     const activeServiceNodes = toNumber(data.activeServiceNodes || data.active_service_nodes || data.activeNodes || data.active);
-    const stakingRequirement = toNumber(data.stakingRequirement || data.staking_requirement) || DEFAULT.stakingRequirement;
+    const stakingRequirement = toNumber(data.stakingRequirement || data.staking_requirement) || STAKING_REQUIREMENT;
     if (!activeServiceNodes) return null;
     return {
       activeServiceNodes: activeServiceNodes,
@@ -76,36 +72,59 @@
       latestBlockHeight: toNumber(data.latestBlockHeight || data.lastBlockHeight),
       latestBlockAge: data.latestBlockAge || data.lastBlockAge || null,
       serverTime: data.serverTime || null,
+      fetchedAt: data.fetchedAt || null,
       source: data.source || "api"
     };
   }
 
+  function readCache() {
+    try {
+      const cached = JSON.parse(window.localStorage.getItem(CACHE_KEY) || "null");
+      if (!cached || !cached.savedAt || Date.now() - cached.savedAt > CACHE_MAX_AGE) return null;
+      const stats = parseJson(cached.stats);
+      if (!stats) return null;
+      stats.source = "cache";
+      return stats;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeCache(stats) {
+    try {
+      window.localStorage.setItem(CACHE_KEY, JSON.stringify({
+        savedAt: Date.now(),
+        stats: stats
+      }));
+    } catch (error) {
+    }
+  }
+
   async function fetchStats() {
     const sources = [];
-    if (window.location.protocol !== "file:") sources.push({ url: "/api/judeblock-stats", type: "json" });
-    sources.push({ url: EXPLORER_URL, type: "html" });
+    if (window.location.protocol !== "file:") {
+      sources.push({ url: "/api/judeblock-stats", type: "json", options: { cache: "default" } });
+    }
+    sources.push({ url: EXPLORER_URL, type: "html", options: { cache: "no-store" } });
 
     for (const source of sources) {
       try {
-        const response = await fetch(source.url, { cache: "no-store" });
+        const response = await fetch(source.url, source.options);
         if (!response.ok) continue;
-        if (source.type === "json") {
-          const stats = parseJson(await response.json());
-          if (stats) return stats;
-        } else {
-          const stats = parseExplorerHtml(await response.text());
-          if (stats) return stats;
-        }
+        const stats = source.type === "json"
+          ? parseJson(await response.json())
+          : parseExplorerHtml(await response.text());
+        if (stats) return stats;
       } catch (error) {
       }
     }
 
-    return DEFAULT;
+    return null;
   }
 
   function formatNumber(value) {
     const n = Number(value);
-    if (!Number.isFinite(n)) return String(value || "");
+    if (!Number.isFinite(n)) return "—";
     return n.toLocaleString("en-US");
   }
 
@@ -125,40 +144,101 @@
 
   function setReady(el) {
     if (!el) return;
-    el.classList.remove("is-live-loading");
+    el.classList.remove("is-live-loading", "is-live-unavailable");
     el.classList.add("is-live-ready");
+    el.removeAttribute("aria-busy");
   }
 
-  function applyStats(stats) {
-    const data = Object.assign({}, DEFAULT, stats || {});
-    data.totalJudeStaked = Number(data.activeServiceNodes) * Number(data.stakingRequirement);
+  function setRevision(el, revision) {
+    if (el) el.dataset.liveRevision = String(revision);
+  }
 
+  function applyStats(stats, options) {
+    const activeServiceNodes = stats ? toNumber(stats.activeServiceNodes) : null;
+    const stakingRequirement = stats ? (toNumber(stats.stakingRequirement) || STAKING_REQUIREMENT) : STAKING_REQUIREMENT;
+    if (!activeServiceNodes) return false;
+
+    const totalJudeStaked = activeServiceNodes * stakingRequirement;
     const active = document.querySelector('[data-live-stat="activeServiceNodes"]');
     const total = document.querySelector('[data-live-stat="totalJudeStaked"]');
     const requirement = document.querySelector('[data-live-stat="stakingRequirement"]');
     const updated = document.querySelector('[data-live-stat="lastBlockAge"]');
     const panel = document.querySelector(".status-panel");
+    const source = options && options.source ? options.source : (stats.source || "api");
+    const revision = ++liveRevision;
 
-    if (active) active.textContent = formatNumber(data.activeServiceNodes);
-    if (total) total.innerHTML = formatJude(data.totalJudeStaked);
-    if (requirement) requirement.innerHTML = formatJude(data.stakingRequirement);
+    if (active) active.textContent = formatNumber(activeServiceNodes);
+    if (total) total.innerHTML = formatJude(totalJudeStaked);
+    if (requirement) requirement.innerHTML = formatJude(stakingRequirement);
     if (updated) {
-      updated.textContent = formatBlockAge(data.latestBlockAge);
+      updated.textContent = source === "cache" ? "Cached" : formatBlockAge(stats.latestBlockAge);
       const titleParts = [];
-      if (data.latestBlockHeight) titleParts.push("Latest block: " + data.latestBlockHeight);
-      if (data.latestBlockAge) titleParts.push("Explorer age: " + data.latestBlockAge);
-      if (data.serverTime) titleParts.push("Explorer server time: " + data.serverTime);
+      if (source === "cache") titleParts.push("Updating live network data");
+      if (stats.latestBlockHeight) titleParts.push("Latest block: " + stats.latestBlockHeight);
+      if (stats.latestBlockAge && source !== "cache") titleParts.push("Explorer age: " + stats.latestBlockAge);
+      if (stats.serverTime) titleParts.push("Explorer server time: " + stats.serverTime);
       if (titleParts.length) updated.setAttribute("title", titleParts.join(" | "));
+      else updated.removeAttribute("title");
     }
 
-    [active, total, requirement, updated].forEach(setReady);
-    if (panel) panel.setAttribute("data-live-source", data.source || "fallback");
+    [active, total, requirement, updated].forEach((el) => {
+      setRevision(el, revision);
+      setReady(el);
+    });
+    if (panel) panel.setAttribute("data-live-source", source);
+
+    document.dispatchEvent(new CustomEvent("judecoin:live-stats-ready", {
+      detail: { source: source, revision: revision }
+    }));
+    return true;
+  }
+
+  function showUnavailable() {
+    const active = document.querySelector('[data-live-stat="activeServiceNodes"]');
+    const total = document.querySelector('[data-live-stat="totalJudeStaked"]');
+    const updated = document.querySelector('[data-live-stat="lastBlockAge"]');
+    const panel = document.querySelector(".status-panel");
+
+    if (active) active.textContent = "—";
+    if (total) total.innerHTML = '— <span class="metric-unit">JUDE</span>';
+    if (updated) {
+      updated.textContent = "Unavailable";
+      updated.setAttribute("title", "Live network data is temporarily unavailable");
+    }
+    [active, total, updated].forEach((el) => {
+      if (!el) return;
+      el.classList.remove("is-live-loading", "is-live-ready");
+      el.classList.add("is-live-unavailable");
+      el.removeAttribute("aria-busy");
+    });
+    if (panel) panel.setAttribute("data-live-source", "unavailable");
   }
 
   function init() {
-    document.querySelectorAll("[data-live-stat]").forEach((el) => el.classList.add("is-live-loading"));
-    applyStats(DEFAULT);
-    fetchStats().then(applyStats);
+    const liveValues = document.querySelectorAll(
+      '[data-live-stat="activeServiceNodes"], [data-live-stat="totalJudeStaked"], [data-live-stat="lastBlockAge"]'
+    );
+    liveValues.forEach((el) => {
+      el.classList.add("is-live-loading");
+      el.setAttribute("aria-busy", "true");
+    });
+
+    const requirement = document.querySelector('[data-live-stat="stakingRequirement"]');
+    if (requirement) {
+      requirement.innerHTML = formatJude(STAKING_REQUIREMENT);
+      setReady(requirement);
+    }
+
+    const cached = readCache();
+    if (cached) applyStats(cached, { source: "cache" });
+
+    fetchStats().then((stats) => {
+      if (stats && applyStats(stats)) {
+        writeCache(stats);
+      } else if (!cached) {
+        showUnavailable();
+      }
+    });
   }
 
   ready(init);

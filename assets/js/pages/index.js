@@ -173,6 +173,7 @@
     const parsed = parseNumber(finalText);
     if (!parsed) return;
     const finalHtml = el.innerHTML;
+    const liveRevision = el.dataset.liveRevision || "";
     const unitMatch = finalText.match(/\b(JUDE)\b/);
     const unit = unitMatch ? unitMatch[1] : "";
     const suffix = unit ? "" : parsed.suffix;
@@ -182,6 +183,10 @@
     el.classList.add("vfx-counting");
 
     function frame(now) {
+      if ((el.dataset.liveRevision || "") !== liveRevision) {
+        el.classList.remove("vfx-counting");
+        return;
+      }
       const t = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - t, 3);
       const current = Math.round(parsed.value * eased);
@@ -206,17 +211,31 @@
     const panel = document.querySelector(".status-panel");
     if (!panel) return;
     const values = Array.from(panel.querySelectorAll(".metric-card strong"));
-    if (!("IntersectionObserver" in window)) {
+    let visible = !("IntersectionObserver" in window);
+    let statsReady = ["cache", "api", "explorer"].includes(panel.getAttribute("data-live-source"));
+
+    function maybeAnimate() {
+      if (!visible || !statsReady) return;
       values.forEach(animateMetric);
-      return;
     }
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        values.forEach(animateMetric);
-        observer.disconnect();
-      }
-    }, { threshold: 0.28 });
-    observer.observe(panel);
+
+    document.addEventListener("judecoin:live-stats-ready", function () {
+      statsReady = true;
+      maybeAnimate();
+    });
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          visible = true;
+          maybeAnimate();
+          observer.disconnect();
+        }
+      }, { threshold: 0.28 });
+      observer.observe(panel);
+    } else {
+      maybeAnimate();
+    }
   }
 
   function init() {

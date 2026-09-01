@@ -1,13 +1,5 @@
 export async function onRequestGet() {
   const explorerUrl = "https://www.judeblock.org/";
-  const fallback = {
-    activeServiceNodes: 364,
-    stakingRequirement: 23600,
-    totalJudeStaked: 364 * 23600,
-    latestBlockHeight: null,
-    latestBlockAge: null,
-    source: "fallback"
-  };
 
   function toNumber(value) {
     if (value === undefined || value === null) return null;
@@ -53,7 +45,7 @@ export async function onRequestGet() {
 
   const headers = {
     "content-type": "application/json; charset=utf-8",
-    "cache-control": "public, max-age=60",
+    "cache-control": "public, max-age=30, s-maxage=30, stale-while-revalidate=120",
     "access-control-allow-origin": "*"
   };
 
@@ -65,6 +57,16 @@ export async function onRequestGet() {
     const data = parseExplorer(await response.text());
     return new Response(JSON.stringify(data), { headers });
   } catch (error) {
-    return new Response(JSON.stringify({ ...fallback, error: String(error && error.message ? error.message : error), fetchedAt: new Date().toISOString() }), { headers });
+    return new Response(JSON.stringify({
+      error: String(error && error.message ? error.message : error),
+      source: "unavailable",
+      fetchedAt: new Date().toISOString()
+    }), {
+      status: 502,
+      headers: {
+        ...headers,
+        "cache-control": "no-store"
+      }
+    });
   }
 }
