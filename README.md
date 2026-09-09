@@ -36,6 +36,7 @@ It provides access to project information, JUDE resources, staking guidance, eco
   - [Who uses Judecoin?](https://www.judecoin.info/who-uses-judecoin.html)
   - [Community News](https://www.judecoin.info/community-news.html)
   - [Security Center](https://www.judecoin.info/security.html)
+  - [Join US](https://www.judecoin.info/join-us.html)
 
 - **[Download Wallet](https://www.judecoin.info/downloads.html)**
 
