@@ -2278,7 +2278,7 @@ footer.site-footer{
   .footer-bottom-row,.site-footer .footer-inner,.footer-inner{align-items:flex-start!important;flex-direction:column!important;}
 }
 
-/* Clearer hero shield scan-tech animation — stronger but still controlled */
+/* Hero shield scan animation. */
 @keyframes judeClearFrameBreath {
   0%, 100% {
     opacity: .50;
@@ -2458,7 +2458,7 @@ footer.site-footer{
   }
 }
 
-/* Harmonized hero shield animation — removes the detached light wave and keeps motion inside the shield form */
+/* Keep the hero animation inside the shield. */
 @keyframes judeHarmonicFrameBreath {
   0%, 100% {
     opacity: .52;

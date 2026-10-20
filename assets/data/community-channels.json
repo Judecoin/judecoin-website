@@ -1,0 +1,43 @@
+{
+  "last_updated": "2026-10-20",
+  "channels": [
+    {
+      "id": "github",
+      "name": "GitHub",
+      "url": "https://github.com/Judecoin",
+      "destination_type": "project_channel"
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "url": "https://discord.gg/wcwXGJPyha",
+      "destination_type": "project_channel"
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram",
+      "url": "https://t.me/JudecoinCommunity",
+      "destination_type": "project_channel"
+    },
+    {
+      "id": "x",
+      "name": "X",
+      "url": "https://x.com/judecoin_",
+      "destination_type": "project_channel"
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "url": "https://www.youtube.com/@Judecoin-Community",
+      "destination_type": "project_channel"
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "url": "https://www.facebook.com/",
+      "destination_type": "platform_home"
+    }
+  ],
+  "slogan": "Open source. Build it. Verify it. Own it.",
+  "slogan_source": "https://x.com/judecoin_/with_replies"
+}

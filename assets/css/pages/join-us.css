@@ -1,0 +1,185 @@
+/* Community channel page styles. */
+.join-page {
+  --join-card-bg: color-mix(in srgb, var(--surface) 93%, transparent);
+  --join-accent: var(--green-bright);
+  --join-ink: var(--text);
+  padding: 0;
+  isolation: isolate;
+}
+[data-theme="light"] .join-page {
+  --join-card-bg: rgba(255, 251, 244, .88);
+  --join-accent: var(--green-deep);
+  --join-ink: #16352d;
+}
+.join-container { max-width: 1152px; }
+.join-hero { text-align: center; padding: 67px 0 43px; }
+
+
+html body main.join-page h1.join-title {
+  margin: 19px 0 19px !important;
+  font-size: clamp(48px, 6vw, 80px) !important;
+  line-height: 1.07 !important;
+  letter-spacing: -.045em !important;
+  overflow-wrap: anywhere;
+}
+html body main.join-page p.join-intro {
+  max-width: 680px;
+  margin: 0 auto !important;
+  font-size: 18px !important;
+  line-height: 1.7 !important;
+  color: var(--muted) !important;
+}
+.join-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; scroll-margin-top: 128px; }
+html body main.join-page .join-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 21px 26px 24px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  color: var(--join-ink);
+  background: var(--join-card-bg);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, .025);
+  text-align: center;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background-color .22s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.join-card-top { display: flex; align-items: center; justify-content: flex-end; min-height: 23px; align-self: stretch; gap: 8px; }
+
+.join-arrow { width: 21px; height: 21px; color: var(--muted); transition: transform .22s ease, color .22s ease; }
+.join-logo { display: grid; place-items: center; width: 112px; height: 102px; margin: 10px auto 15px; color: var(--join-ink); }
+.join-logo svg { display: block; width: 82px; height: 82px; overflow: visible; }
+.join-logo-discord svg { width: 90px; height: 90px; }
+.join-logo-telegram svg { width: 78px; height: 78px; }
+.join-logo-x svg { width: 74px; height: 74px; }
+.join-logo-youtube svg { width: 96px; height: 96px; }
+.join-logo-facebook svg { width: 77px; height: 77px; }
+html body main.join-page h2.join-platform {
+  margin: 0 0 7px !important;
+  color: var(--join-ink) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.035em !important;
+  line-height: 1.3 !important;
+}
+.join-description { display: block; color: var(--muted); font-size: 14px; line-height: 1.65; min-height: 24px; }
+.join-card-action { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line-soft); color: var(--join-accent); font-size: 13px; font-weight: 700; line-height: 1.55; }
+.join-card-action > span { font-size: 17px; line-height: 1; transition: transform .22s ease; }
+
+
+
+
+@media (hover: hover) {
+  html body main.join-page a.join-card:hover {
+    border-color: var(--green);
+    background: var(--surface);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .10);
+    transform: translateY(-5px);
+  }
+  a.join-card:hover .join-arrow { color: var(--join-accent); transform: translate(2px, -2px); }
+  a.join-card:hover .join-card-action > span { transform: translateX(3px); }
+}
+html body main.join-page a.join-card:focus-visible { outline: 3px solid var(--green-bright); outline-offset: 5px; border-color: var(--green); }
+
+
+
+
+
+
+
+
+.join-security { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 14px 18px; border: 1px solid var(--line-soft); border-radius: 14px; background: color-mix(in srgb, var(--surface) 40%, transparent); }
+.join-security > svg { width: 19px; height: 19px; flex: 0 0 19px; color: var(--join-accent); }
+html body main.join-page .join-security p { margin: 0 !important; color: var(--muted) !important; font-size: 12px !important; line-height: 1.7 !important; }
+html body main.join-page .join-security > a { color: var(--join-accent); font-size: 12px; font-weight: 650; white-space: nowrap; margin-left: 12px; }
+.join-security a:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 4px; border-radius: 3px; }
+.join-skip-link { position: fixed; top: -120px; left: 20px; z-index: 1000005; padding: 13px 19px; border: 2px solid var(--green); border-radius: 12px; background: var(--surface); color: var(--text); }
+.join-skip-link:focus { top: 20px; }
+@media (max-width: 1000px) {
+  .join-hero { padding-top: 52px; }
+  .join-grid { gap: 16px; }
+  html body main.join-page .join-card { padding: 18px 20px 20px; }
+  .join-description { min-height: 46px; }
+}
+@media (max-width: 760px) {
+  .join-hero { padding-top: 40px; padding-bottom: 31px; }
+  .join-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .join-security { flex-wrap: wrap; }
+  .join-security p { flex: 1 1 220px; }
+  .join-security > a { margin-left: 0 !important; }
+  .join-description { min-height: 24px; }
+  html body main.join-page p.join-intro { font-size: 16px !important; max-width: 510px; }
+}
+@media (max-width: 480px) {
+  .join-grid { gap: 12px; }
+  html body main.join-page .join-card { border-radius: 21px; padding: 14px 13px 16px; }
+  
+  .join-logo { width: 83px; height: 82px; margin: 8px auto 12px; }
+  .join-logo svg { width: 63px; height: 63px; }
+  .join-logo-discord svg { width: 70px; height: 70px; }
+  .join-logo-telegram svg { width: 62px; height: 62px; }
+  .join-logo-x svg { width: 58px; height: 58px; }
+  .join-logo-youtube svg { width: 73px; height: 73px; }
+  .join-logo-facebook svg { width: 61px; height: 61px; }
+  html body main.join-page h2.join-platform { font-size: 22px !important; }
+  .join-description { font-size: 12px; min-height: 40px; line-height: 1.55; }
+  .join-card-action { margin-top: 15px; padding-top: 12px; font-size: 11px; gap: 5px; }
+  .join-card-action > span { font-size: 14px; }
+  
+  .join-arrow { width: 18px; height: 18px; }
+  
+  
+  
+  
+  .join-security { align-items: flex-start; gap: 8px; padding: 12px 14px; }
+  .join-security > svg { margin-top: 1px; }
+  .join-security p { flex-basis: 210px; }
+  
+  
+  
+}
+@media (max-width: 359px) {
+  .join-grid { grid-template-columns: minmax(0, 1fr); }
+  .join-description { min-height: 0; font-size: 14px; }
+  html body main.join-page .join-card { padding: 18px 25px 20px; }
+  .join-logo { height: 85px; }
+  .join-card-action { font-size: 13px; }
+  
+}
+@media (prefers-reduced-motion: reduce) {
+  .join-card, .join-arrow, .join-card-action > span { transition: none !important; transform: none !important; }
+  html[data-current-page="join-us.html"] { scroll-behavior: auto; }
+}
+@media (forced-colors: active) {
+  .join-card { border-color: CanvasText !important; }
+  .join-card:focus-visible { outline-color: Highlight !important; }
+  .join-logo { color: CanvasText; }
+}
+
+/* Community channel layout. */
+html body main.join-page h1.join-title { margin-top: 0 !important; }
+html body main.join-page p.join-slogan {
+  margin: 8px auto 0 !important;
+  max-width: 680px;
+  color: var(--muted) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+  letter-spacing: 0 !important;
+}
+.join-logo-github, .join-logo-x { color: #181717; }
+html[data-theme="dark"] .join-logo-github,
+html[data-theme="dark"] .join-logo-x { color: #FFFFFF; }
+.join-logo-discord { color: #5865F2; }
+.join-logo-telegram { color: #26A5E4; }
+.join-logo-youtube { color: #FF0033; }
+.join-logo-facebook { color: #0866FF; }
+.join-security { margin-top: 34px; }
+@media (max-width: 480px) {
+  html body main.join-page p.join-slogan { font-size: 12px !important; }
+  .join-security { margin-top: 25px; }
+}

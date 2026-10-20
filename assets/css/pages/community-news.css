@@ -1033,7 +1033,7 @@ html body footer .social-icon:hover{
   font-weight:400!important;
 }
 
-/* 2026-06-13 Community News: make speaker headings visually clear */
+/* Community news speaker headings. */
 .update-card .update-content h4.news-section-title,
 .update-card[open] .update-content h4.news-section-title{
   display:block!important;

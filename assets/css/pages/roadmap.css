@@ -3472,7 +3472,7 @@ footer.site-footer{
   }
 }
 
-/* Roadmap overview — final 2026 presentation */
+/* Roadmap overview. */
 .roadmap-visual-v2 {
   min-height: 330px !important;
   overflow: hidden;
@@ -3781,7 +3781,7 @@ footer.site-footer{
   .roadmap-stats .roadmap-stat { transition: none; }
 }
 
-/* Final orbit artwork, compact rhythm, and clearly separated status colors */
+/* Roadmap orbit and status colors. */
 .roadmap-hero {
   padding: 64px 0 34px !important;
   gap: 40px !important;
@@ -4003,7 +4003,7 @@ footer.site-footer{
   50% { opacity: 1; transform: scale(1.35); }
 }
 
-/* Stronger status separation */
+/* Status icons. */
 .roadmap-stats {
   gap: 14px !important;
   margin-bottom: 22px !important;
@@ -4222,7 +4222,7 @@ footer.site-footer{
   }
 }
 
-/* Final correction: unified surfaces; status is communicated by icons, not backgrounds */
+/* Status icons on unified surfaces. */
 [data-theme="dark"] .roadmap-stats .roadmap-stat,
 [data-theme="dark"] .roadmap-stats .roadmap-stat.progress,
 [data-theme="dark"] .roadmap-stats .roadmap-stat.planned {
@@ -4301,14 +4301,14 @@ footer.site-footer{
   }
 }
 
-/* Year cards are chronological containers and remain status-neutral */
+/* Chronological year cards. */
 .stage-grid .year-card,
 .stage-grid .year-card:first-child,
 .stage-grid .future-stage {
   border-top: 0 !important;
 }
 
-/* Evergreen roadmap animation: a continuous technical path, never tied to a year */
+/* Continuous roadmap animation. */
 .roadmap-route-scene {
   position: absolute;
   z-index: 3;
@@ -4504,7 +4504,7 @@ footer.site-footer{
   }
 }
 
-/* Light-theme status icons need explicit specificity to override legacy theme rules */
+/* Light theme status icon overrides. */
 [data-theme="light"] .roadmap-item.done .roadmap-item-icon {
   color: #ffffff !important;
   border-color: rgba(16, 151, 81, .34) !important;
@@ -4552,7 +4552,7 @@ footer.site-footer{
   }
 }
 
-/* Keep paired desktop year cards visually balanced when item counts differ */
+/* Balanced desktop year cards. */
 .history-grid {
   grid-auto-rows: auto;
 }
@@ -4578,7 +4578,7 @@ footer.site-footer{
   }
 }
 
-/* Final roadmap structure: one chronological card column */
+/* Single-column roadmap. */
 .stage-grid,
 .history-grid {
   grid-template-columns: minmax(0, 1fr) !important;

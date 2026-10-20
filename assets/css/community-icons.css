@@ -1,0 +1,20 @@
+/* Community footer icons. */
+html body footer .footer-social[data-community-footer] .social-icon {
+  opacity: 1 !important;
+}
+html body footer .footer-social[data-community-footer] .social-icon[data-community-channel="github"],
+html body footer .footer-social[data-community-footer] .social-icon[data-community-channel="x"] {
+  color: #181717 !important;
+}
+html[data-theme="dark"] body footer .footer-social[data-community-footer] .social-icon[data-community-channel="github"],
+html[data-theme="dark"] body footer .footer-social[data-community-footer] .social-icon[data-community-channel="x"] {
+  color: #FFFFFF !important;
+}
+html body footer .footer-social[data-community-footer] .social-icon[data-community-channel="discord"] { color: #5865F2 !important; }
+html body footer .footer-social[data-community-footer] .social-icon[data-community-channel="telegram"] { color: #26A5E4 !important; }
+html body footer .footer-social[data-community-footer] .social-icon[data-community-channel="youtube"] { color: #FF0033 !important; }
+html body footer .footer-social[data-community-footer] .social-icon[data-community-channel="facebook"] { color: #0866FF !important; }
+html body footer .footer-social[data-community-footer] .social-icon:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+}
